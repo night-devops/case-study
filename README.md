@@ -10,7 +10,6 @@
   **[aws-kubernetes-jenkins-helloworld](/aws-kubernetes-jenkins-helloworld)** altında bulabilirsiniz.
 - [ ] 5 Dakikada 1 çalışan Kubernetes Cron Job’ı ile Kubernetes üzerinde bulunan “Hello World” dönen uygulamamız’a yük altında bırakılması ve uygulamamızın cpu bazlı scale up - scale down olması <br>
 - [ ] Sonarcube entegrasyonu ile kod kalite ve test coverage metriklerin kontrol edilmesi <br>
-  Maalesef yetiştiremedim
 - [x] Süreçlerin küçük bir döküman üzerinde anlatılması, yararlandığımız araçların ve scriptlerin paylaşılması <br>
   **README.md** dosyasında yapılanları bulabilirsiniz.
 - [x] Monitoring için nelere dikkat edilmeli? Alarm mekanizması nasıl kurulmalı? <br>
@@ -601,3 +600,32 @@ Case 1 ve Case 2 de uyguladığımız gibi sırasıyla **create_s3_bucket.tf** *
 #### Kubernetes Cluster oluşturulur
 
 Case 1 ve Case 2 de uyguladığımız gibi fakat burada [HelloWorld/kubernetes](/kubernetes) altında bulunan yaml dosyaları kullanılarak yaratılır.
+
+---
+
+## 5 Kubernetes Cron Job’ı Scale up - Scale down olması
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Konu hakkında araştırmalarımı ve denemelerimi yaptım fakat tam olarak sonuca ulaşamadığım için akışı paylaşmadım.
+
+Destek aldığım dokümanlar
+
+- [Jobs - Run to Completion](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/)
+- [Running automated tasks with cron jobs](https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/)
+- [Kubernetes App Auto-scaling](https://github.com/aws-samples/aws-workshop-for-kubernetes/tree/master/03-path-application-development/304-app-scaling)
+- [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+- [Use a Service to Access an Application in a Cluster](https://kubernetes.io/docs/tasks/access-application-cluster/service-access-application-cluster/)
+
+---
+
+## 6. Sonarcube
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bu konuyu yetiştiremedim.
+
+---
+
+## 7. Monitoring için nelere dikkat edilmeli? Alarm mekanizması nasıl kurulmalı ?
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sistemlerde monitoring altyapısı application ve infrastructre seviyesinde 2'ye ayırabiliriz. Application seviyesinde uygulamanın anlık aldığı istek sayısı, yapılan işlem süreleri, throw exception saayıları, yaşanan hatalar ve sayıları gibi metrikler toplanarak ElasticSearch, NLog gibi altyapılarda loglanıp merkezi bir alarm sistemi üzerinden belirlenen durumlara göre alarmlar üretilmeli. Infrastructure seviyesinde bakıldığında CPU, MEMORY, Network Input-Output ve Disk IO gibi metrikler incelenerek anlık olarak Prometheus+Graphana gibi altyapılarla anlık monitoring imkanı sağlanmalıdır. Ayrıca bu ortamlarda da belli thresholdlar belirlenip merkezi alarm sistemi üzerinden alarmlar üretilmeli.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alarm mekanizmaları oluşan alarmları alarm tipine göre kolaylıkla sorumlu ekibe escale edebileceğiniz. Aynı tip hataları gruplayabileceğiniz ve hata tiplerine göre korelasyon yapabileceğiniz bir alt yapı olmalıdır. Ayrıca, birden fazla farklı platformları incelemek için log mekanızmalarınız olabilir. Alarm sisteminin bu tip araçlarla kolay entegrasyon sağlayabiliyor olması lazım.
+
