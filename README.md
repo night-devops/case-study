@@ -601,6 +601,14 @@ Case 1 ve Case 2 de uyguladığımız gibi sırasıyla **create_s3_bucket.tf** *
 
 Case 1 ve Case 2 de uyguladığımız gibi fakat burada [HelloWorld/kubernetes](/kubernetes) altında bulunan yaml dosyaları kullanılarak yaratılır.
 
+#### Deployment
+
+Case 1 ve Case de uyguladığımız gibi image update sonrası `kubectl apply` ve Jenkins Kubernetes Plugin ile deployment işlemlerini gerçekleştiririz.
+
+#### NOT
+
+Burada asıl ulaşmak istediğim nokta [Keel](https://keel.sh/) - [BuildBot](http://buildbot.net/) gibi araçlar kullanarak image update işlemi gerçekleştikten sonra otomatik olarak deployment işlemlerinin gerçekleşmesi. Denedim fakat yetişremedim.
+
 ---
 
 ## 5 Kubernetes Cron Job’ı Scale up - Scale down olması
@@ -625,7 +633,7 @@ Destek aldığım dokümanlar
 
 ## 7. Monitoring için nelere dikkat edilmeli? Alarm mekanizması nasıl kurulmalı ?
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sistemlerde monitoring altyapısı application ve infrastructre seviyesinde 2'ye ayırabiliriz. Application seviyesinde uygulamanın anlık aldığı istek sayısı, yapılan işlem süreleri, throw exception saayıları, yaşanan hatalar ve sayıları gibi metrikler toplanarak ElasticSearch, NLog gibi altyapılarda loglanıp merkezi bir alarm sistemi üzerinden belirlenen durumlara göre alarmlar üretilmeli. Infrastructure seviyesinde bakıldığında CPU, MEMORY, Network Input-Output ve Disk IO gibi metrikler incelenerek anlık olarak Prometheus+Graphana gibi altyapılarla anlık monitoring imkanı sağlanmalıdır. Ayrıca bu ortamlarda da belli thresholdlar belirlenip merkezi alarm sistemi üzerinden alarmlar üretilmeli.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sistemlerde monitoring altyapısını application ve infrastructre seviyesinde 2'ye ayırabiliriz. Application seviyesinde uygulamanın anlık aldığı istek sayısı, yapılan işlem süreleri, throw exception sayıları, yaşanan hatalar ve sayıları gibi metrikler toplanarak ElasticSearch, NLog gibi altyapılarda loglanıp merkezi bir alarm sistemi üzerinden belirlenen durumlara göre alarmlar üretilmeli. Infrastructure seviyesinde bakıldığında CPU, MEMORY, Network Input-Output ve Disk IO gibi metrikler incelenerek anlık olarak Prometheus+Graphana gibi altyapılarla anlık monitoring imkanı sağlanmalıdır. Ayrıca bu ortamlarda da belli thresholdlar belirlenip merkezi alarm sistemi üzerinden alarmlar üretilmelidir.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alarm mekanizmaları oluşan alarmları alarm tipine göre kolaylıkla sorumlu ekibe escale edebileceğiniz. Aynı tip hataları gruplayabileceğiniz ve hata tiplerine göre korelasyon yapabileceğiniz bir alt yapı olmalıdır. Ayrıca, birden fazla farklı platformları incelemek için log mekanızmalarınız olabilir. Alarm sisteminin bu tip araçlarla kolay entegrasyon sağlayabiliyor olması lazım.
 
