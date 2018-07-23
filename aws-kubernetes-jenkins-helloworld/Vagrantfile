@@ -1,0 +1,91 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$UpdateSystem = <<SCRIPT
+# Updating Linux OS
+# if you rur script  privileged: false mode, you should run it with `sudo` 
+apt-get -qqy update \
+  && apt-get -qqy --no-install-recommends upgrade \
+  && apt-get -qqy --no-install-recommends dist-upgrade \
+  && apt-get -qqy -f install \
+  && apt-get -qqy --no-install-recommends autoremove \
+  && apt-get -qqy --no-install-recommends autoclean \
+  && apt-get -qqy update
+SCRIPT
+
+$InstallTerraform = <<SCRIPT
+# Installing Terraform via Terraform Installer by @RobertPeteuil
+curl -LO https://raw.github.com/robertpeteuil/terraform-installer/master/terraform-install.sh
+chmod +x terraform-install.sh
+apt-get -qqy install unzip
+echo -e "b" | ./terraform-install.sh
+SCRIPT
+
+$InstallDocker = <<SCRIPT
+# Installing Docker
+curl -LO https://download.docker.com/linux/ubuntu/dists/xenial/pool/stable/amd64/docker-ce_18.06.0~ce~3-0~ubuntu_amd64.deb
+dpkg -i docker-ce_18.06.0~ce~3-0~ubuntu_amd64.deb 
+echo -e "\033[33mNote: Installation will be fail due to libltdl7 dependency, but the following codes will be fixed after running\033[0m"
+apt-get -qqy -f install
+apt-get -qqy update
+SCRIPT
+
+$InstallJenkins = <<SCRIPT
+# Installing Jenkins
+wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | apt-key add -
+echo deb https://pkg.jenkins.io/debian-stable binary/ | tee /etc/apt/sources.list.d/jenkins.list
+apt-get -qqy update
+apt-get -qqy install jenkins
+SCRIPT
+
+$RunJenkins = <<SCRIPT
+# Run Jenkins
+systemctl start jenkins
+systemctl status jenkins
+ufw allow 8080
+ufw status
+cat /var/lib/jenkins/secrets/initialAdminPassword >> /vagrant/JenkinsPass.txt
+SCRIPT
+
+$InstallCakeDependencies = <<SCRIPT
+apt-get -qqy update 
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+apt install apt-transport-https
+echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+apt-get -qqy update
+apt-get -qqy install mono-complete libcurl4-openssl-dev libunwind8
+SCRIPT
+
+# --> Local/Lang Settings
+ENV["LC_ALL"] = "en_US.UTF-8"
+ENV["LANG"] = "en_US.UTF-8"
+
+Vagrant.configure(2) do |config|
+   config.vm.provider "virtualbox" do |v|
+   # It's for --> Stderr: VBoxManage.exe: error: RawFile#0 failed to create the raw output file ERROR
+   v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
+   v.memory = 2048
+   end
+   # --> Box olustururken yeni box da sifre hatasi olmamasi icin
+   config.ssh.insert_key = false
+   # --> Kullanilan VagrantBox icin yeni versyon kontrolu yapar 
+   config.vm.box_check_update = false
+   config.vm.box = "ubuntu/xenial64"
+
+   # Port Forwarding
+   config.vm.network "forwarded_port", guest: 8080, host: 8080
+ 
+   # --> Provision Scripts
+   config.vm.provision "shell", inline: $UpdateSystem
+   config.vm.provision :reload   
+   config.vm.provision "awscli-installation", type: "shell", path: "scripts/awscli-install.sh", args: "python3", privileged: false
+   config.vm.provision "kubectl-kops-install", type: "shell", path: "scripts/kubectl-kops-install.sh", privileged: false
+   config.vm.provision "java-install", type: "shell", path: "scripts/java-install.sh", privileged: false
+   config.vm.provision "shell", inline: $InstallTerraform
+   config.vm.provision "shell", inline: $InstallDocker
+   config.vm.provision "shell", inline: $InstallJenkins
+   config.vm.provision "shell", inline: $InstallCakeDependencies
+   config.vm.provision "shell", inline: $RunJenkins
+   config.vm.provision "dotnetcore-install", type: "shell", path: "scripts/dotnetcore-install.sh", args: "2.1", privileged: false
+   config.vm.synced_folder "./apps", "/vagrant", disabled: false, create: true
+end
